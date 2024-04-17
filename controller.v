@@ -29,17 +29,18 @@ module controller(
     input wire [1:0] status_signals,
     output reg [4:0] control_signals,
     output reg fifo_full,
-    output reg done
-
+    output reg fifo_empty
+    
     );
     
-    reg [2:0] state,next_state;
+    reg [1:0] state,next_state;
     
-    parameter state_0 = 3'b000;
-    parameter state_1 = 3'b001;
-    parameter state_2 = 3'b010;
-    parameter state_3 = 3'b011;
-    parameter state_4 = 3'b100;
+    parameter state_0 = 2'b00;
+    parameter state_1 = 2'b01;
+    parameter state_2 = 2'b10;
+    
+   
+    (*dont_touch = "true" *)
     
     
     always @(posedge clk,posedge rst) begin
@@ -56,40 +57,30 @@ module controller(
         
         state_0: next_state <= state_1;
         state_1: begin
-            if(we)
-                next_state <= state_2;
-            else
+            if(we==0 && re==0)
                 next_state <= state_1;
+            else 
+                next_state <= state_2;
         end
         state_2:begin
-            if(status_signals[0])
-                next_state <= state_3;
-            else
                 next_state <= state_1;
         end
-        state_3:begin
-            if(re)
-                next_state <= state_4;
-            else
-                next_state <= state_3;
-        end
-        state_4:begin
-            if(status_signals[1])
-                next_state <= state_0;
-            else
-                next_state <= state_3;
-        end
+
         default: next_state <= state_0;
     endcase 
     end
     
-    always @(state,we,re,status_signals) begin
-    
+    always @(state,we,re,status_signals) begin // status_signals = {r_adr_equal,w_adr_equal}
+                                               // control_signals = {load_data,read_data,rst,r_adr_trigger,w_adr_trigger}
     case(state)
         state_0: control_signals <= 5'b00100;
         state_1: begin
-            if(we)
-                control_signals <= 5'b10001;
+            if(we==1&&re==1)                    // load and read data 
+                control_signals <= 5'b11011;  
+            else if(we==1&&re==0)               // load data
+                control_signals <= 5'b10001; 
+            else if(we==0&&re==1)               // read data
+                control_signals <= 5'b01010;
             else
                 control_signals <= 5'b00000;
         end
@@ -99,18 +90,7 @@ module controller(
             else
                 control_signals <= 5'b00000;
         end
-        state_3:begin
-            if(re)
-                control_signals <= 5'b01010;
-            else
-                control_signals <= 5'b00000;
-        end
-        state_4:begin
-            if(status_signals[1])
-                control_signals <= 5'b00000;
-            else
-                control_signals <= 5'b00000;
-        end
+
         default: control_signals <= 5'b00000;
     endcase
     end 
@@ -118,33 +98,24 @@ module controller(
     always @(state,re,status_signals) begin
     
     case(state)
+
         state_2: begin
             if(status_signals[0])
                 fifo_full <= 1'b1;
             else
                 fifo_full <= 1'b0;
          end
-         state_3: begin
-            if(re)
-                fifo_full <= 1'b0;
-            else
-                fifo_full <= 1'b1;
-         end
+
          default: fifo_full <= 1'b0;
     endcase
     end
     
-    always @(state,status_signals) begin
+    always @(state) begin
     
     case(state)
-        state_4: begin
-            if(status_signals[1])
-                done <= 1'b1;
-            else
-                done <= 1'b0;
-         end
-       
-         default: done <= 1'b0;
+        state_0: fifo_empty <= 1'b1;
+
+         default: fifo_empty <= 1'b0;
     endcase
     end
         

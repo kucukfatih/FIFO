@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module memory#(parameter width = 16, parameter depth = 8,parameter adr_width = 3)(
+module memory#(parameter width = 16, parameter depth = 8,parameter adr_width = $clog2(depth))(
 
     
     input wire [width-1:0] data_in,

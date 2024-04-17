@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = 3)(
+module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $clog2(depth))(
 
     input wire clk,
     input wire rst,
@@ -28,7 +28,7 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = 3)(
     input wire we,
     input wire re,
     output wire fifo_full,
-    output wire done,
+    output wire fifo_empty,
     output wire [width-1:0] data_out
 
     );
@@ -38,6 +38,8 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = 3)(
     
     wire [adr_width-1:0] w_adr_w;
     wire [adr_width-1:0] r_adr_w;
+    
+    (*dont_touch = "true" *)
      
     controller con1(.clk(clk),
     .rst(rst),
@@ -46,7 +48,7 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = 3)(
     .status_signals(status_signals_w),
     .control_signals(control_signals_w),
     .fifo_full(fifo_full),
-    .done(done));
+    .fifo_empty(fifo_empty));
     
     memory mem1(.data_in(data_in),
     .w_adr(w_adr_w),
@@ -55,19 +57,19 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = 3)(
     .read(control_signals_w[3]),
     .data_out(data_out));
     
-    comp w_comp (.A(depth),
+    comp w_comp (.A(depth-1),
     .B(w_adr_w),
     .equal_flag(status_signals_w[0]));
     
-    comp r_comp (.A(depth),
+    comp r_comp (.A(depth-1),
     .B(r_adr_w),
     .equal_flag(status_signals_w[1]));
     
-    counter w_cnt (.clk(control_signals_w[0]),
+    counter w_cnt (.clk(clk),.en(control_signals_w[0]),
     .rst(control_signals_w[2]),
     .cnt_out(w_adr_w));
     
-    counter r_cnt (.clk(control_signals_w[1]),
+    counter r_cnt (.clk(clk),.en(control_signals_w[1]),
     .rst(control_signals_w[2]),
     .cnt_out(r_adr_w));
     

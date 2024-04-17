@@ -22,7 +22,7 @@
 
 module counter#(parameter K = 3)(
 
-    input clk,rst,
+    input clk,rst,en,
     output reg [K-1:0] cnt_out
 
     );
@@ -31,8 +31,10 @@ module counter#(parameter K = 3)(
     
     if (rst) 
         cnt_out <= 0;
-    else  
+    else if(en) 
         cnt_out <= cnt_out + 1;
-     
+    else
+        cnt_out <= cnt_out;
+    
     end
 endmodule
