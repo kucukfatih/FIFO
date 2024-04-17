@@ -26,7 +26,7 @@ module controller(
     input wire rst,
     input wire we,
     input wire re,
-    input wire [1:0] status_signals,
+    input wire [4:0] status_signals,
     output reg [4:0] control_signals,
     output reg fifo_full,
     output reg fifo_empty
@@ -95,12 +95,12 @@ module controller(
     endcase
     end 
     
-    always @(state,re,status_signals) begin
+    always @(state,status_signals) begin
     
     case(state)
 
         state_2: begin
-            if(status_signals[0])
+            if(status_signals[0]==1 && status_signals[3]==1)
                 fifo_full <= 1'b1;
             else
                 fifo_full <= 1'b0;
@@ -110,10 +110,26 @@ module controller(
     endcase
     end
     
-    always @(state) begin
+    always @(state,status_signals) begin
     
     case(state)
         state_0: fifo_empty <= 1'b1;
+        state_1: begin
+            if(status_signals[2]==1 && status_signals[1]==1)
+                fifo_empty <= 1'b1;
+            else if(status_signals[4])
+                fifo_empty <= 1'b1;
+            else
+                fifo_empty <= 1'b0;
+        end
+        state_2: begin
+            if(status_signals[2]==1 && status_signals[1]==1)
+                fifo_empty <= 1'b1;
+            else if(status_signals[4])
+                fifo_empty <= 1'b1;
+            else
+                fifo_empty <= 1'b0;
+        end
 
          default: fifo_empty <= 1'b0;
     endcase

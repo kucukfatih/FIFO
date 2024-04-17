@@ -22,11 +22,14 @@
 
 module comp#(parameter K = 3)(
 
-input [K-1:0] A,B,
-output equal_flag
+input wire [K-1:0] A,B,
+output wire equal_flag,
+output wire zero_flag
 
     );
     
 assign equal_flag = (A == B) ? 1'b1 : 1'b0;
+
+assign zero_flag = (B == 0) ? 1'b1 : 1'b0;
 
 endmodule

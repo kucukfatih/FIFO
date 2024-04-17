@@ -76,7 +76,9 @@ module FIFO_TB;
     #20
     we = 0;
     re = 1;
-    #265
+    #90
+    we = 1;
+    #145;
     $finish;
     end
     

@@ -33,7 +33,7 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
 
     );
     
-    wire [1:0] status_signals_w;
+    wire [4:0] status_signals_w;
     wire [4:0] control_signals_w;
     
     wire [adr_width-1:0] w_adr_w;
@@ -59,11 +59,18 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
     
     comp w_comp (.A(depth-1),
     .B(w_adr_w),
-    .equal_flag(status_signals_w[0]));
+    .equal_flag(status_signals_w[0]),
+    .zero_flag(status_signals_w[2]));
     
     comp r_comp (.A(depth-1),
     .B(r_adr_w),
-    .equal_flag(status_signals_w[1]));
+    .equal_flag(status_signals_w[1]),
+    .zero_flag(status_signals_w[3]));
+    
+    comp adr_comp (.A(w_adr_w),
+    .B(r_adr_w),
+    .equal_flag(status_signals_w[4]),
+    .zero_flag());
     
     counter w_cnt (.clk(clk),.en(control_signals_w[0]),
     .rst(control_signals_w[2]),
