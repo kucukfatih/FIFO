@@ -30,7 +30,7 @@ module FIFO_TB;
     reg we;
     reg re;
     wire fifo_full;
-    wire done;
+    wire fifo_empty;
     wire [width-1:0] data_out;
     
     initial clk = 0;
@@ -42,40 +42,45 @@ module FIFO_TB;
     .we(we),
     .re(re),
     .fifo_full(fifo_full),
-    .done(done),
+    .fifo_empty(fifo_empty),
     .data_out(data_out));
     
     
     
     initial begin 
-    rst = 1;
+    rst = 0;
     #5
+    rst = 1;
+    we = 0;
+    re = 0;
+    #5;
     rst = 0;
     we = 1;
-    re = 0;
     data_in = 16'd1;
-    #5
+    #20
     data_in = 16'd2;
     #20
     data_in = 16'd3;
+    re = 1;
     #20
     data_in = 16'd4;
     #20
     data_in = 16'd5;
     #20
     data_in = 16'd6;
+    re = 0;
     #20
     data_in = 16'd7;
     #20
     data_in = 16'd8;
-    #30
+    #20
     we = 0;
     re = 1;
+    #265
+    $finish;
     end
     
-    always @(posedge done) begin
-        if(done)
-            $finish;
     
-    end
+    
+    
 endmodule

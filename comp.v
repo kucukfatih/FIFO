@@ -3,7 +3,7 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 23.03.2024 22:54:57
+// Create Date: 05.04.2024 13:57:51
 // Design Name: 
 // Module Name: comp
 // Project Name: 
@@ -20,13 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module comp#(parameter K = 3)(
-
-input [K-1:0] A,B,
-output equal_flag
+module comp(
 
     );
-    
-assign equal_flag = (A == B) ? 1'b1 : 1'b0;
-
 endmodule
