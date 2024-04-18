@@ -61,24 +61,23 @@ module FIFO_TB;
     data_in = 16'd2;
     #20
     data_in = 16'd3;
-    re = 1;
+    re = 0;
     #20
     data_in = 16'd4;
     #20
+    re = 1;
     data_in = 16'd5;
     #20
     data_in = 16'd6;
     re = 0;
     #20
     data_in = 16'd7;
-    #20
+    #30
     data_in = 16'd8;
     #20
-    we = 0;
     re = 1;
-    #90
-    we = 1;
-    #145;
+    #160
+    we = 0;
     $finish;
     end
     

@@ -20,16 +20,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module comp#(parameter K = 3)(
+module comp#(parameter K = 4)(
 
 input wire [K-1:0] A,B,
-output wire equal_flag,
-output wire zero_flag
+output wire equal_flag_empty,
+output wire equal_flag_full,
+output wire not_equal_flag
 
     );
     
-assign equal_flag = (A == B) ? 1'b1 : 1'b0;
+assign equal_flag_empty = (A == B) ? 1'b1 : 1'b0;
 
-assign zero_flag = (B == 0) ? 1'b1 : 1'b0;
+assign equal_flag_full = (A[2:0] == B[2:0]) ? 1'b1 : 1'b0;
+
+assign not_equal_flag = (A[3] != B[3]) ? 1'b1 : 1'b0;
+
+
 
 endmodule

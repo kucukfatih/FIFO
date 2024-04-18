@@ -26,7 +26,7 @@ module controller(
     input wire rst,
     input wire we,
     input wire re,
-    input wire [4:0] status_signals,
+    input wire [2:0] status_signals,
     output reg [4:0] control_signals,
     output reg fifo_full,
     output reg fifo_empty
@@ -70,23 +70,21 @@ module controller(
     endcase 
     end
     
-    always @(state,we,re,status_signals) begin // status_signals = {r_adr_equal,w_adr_equal}
-                                               // control_signals = {load_data,read_data,rst,r_adr_trigger,w_adr_trigger}
+    always @(state,we,re,status_signals) begin                  // status_signals = {not_equal_flag,equal_flag_full,equal_flag_empty}
+                                                                // control_signals = {load_data,read_data,rst,r_adr_trigger,w_adr_trigger}
     case(state)
         state_0: control_signals <= 5'b00100;
         state_1: begin
-            if(we==1&&re==1)                    // load and read data 
-                control_signals <= 5'b11011;  
-            else if(we==1&&re==0)               // load data
+            if((we==1&&re==1)&&(!fifo_full && !fifo_empty))     // load and read data (if fifo not full and not empty)
+                control_signals <= 5'b11011;
+            else if((we==1&&re==1)&& fifo_empty)                // load and read data (if fifo empty)
                 control_signals <= 5'b10001; 
-            else if(we==0&&re==1)               // read data
+            else if((we==1&&re==1)&& fifo_full)                 // load and read data (if fifo full)
+                control_signals <= 5'b01010;   
+            else if((we==1&&re==0)&&(!fifo_full))               // load data
+                control_signals <= 5'b10001; 
+            else if((we==0&&re==1)&&(!fifo_empty))               // read data
                 control_signals <= 5'b01010;
-            else
-                control_signals <= 5'b00000;
-        end
-        state_2:begin
-            if(status_signals[0])
-                control_signals <= 5'b00000;
             else
                 control_signals <= 5'b00000;
         end
@@ -95,46 +93,21 @@ module controller(
     endcase
     end 
     
-    always @(state,status_signals) begin
+    always @(*) begin
     
     case(state)
-
-        state_2: begin
-            if(status_signals[0]==1 && status_signals[3]==1)
-                fifo_full <= 1'b1;
-            else
-                fifo_full <= 1'b0;
-         end
-
-         default: fifo_full <= 1'b0;
-    endcase
-    end
+        state_0: begin
     
-    always @(state,status_signals) begin
-    
-    case(state)
-        state_0: fifo_empty <= 1'b1;
-        state_1: begin
-            if(status_signals[2]==1 && status_signals[1]==1)
-                fifo_empty <= 1'b1;
-            else if(status_signals[4])
-                fifo_empty <= 1'b1;
-            else
-                fifo_empty <= 1'b0;
+            fifo_full <= 0;
+            fifo_empty <= 1;
         end
-        state_2: begin
-            if(status_signals[2]==1 && status_signals[1]==1)
-                fifo_empty <= 1'b1;
-            else if(status_signals[4])
-                fifo_empty <= 1'b1;
-            else
-                fifo_empty <= 1'b0;
-        end
-
-         default: fifo_empty <= 1'b0;
-    endcase
-    end
         
-    
-    
+        default: begin
+            fifo_full <= (status_signals[2] && status_signals[1]);
+            fifo_empty <= status_signals[0] ;
+        end
+        
+    endcase
+    end
+
 endmodule

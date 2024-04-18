@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module counter#(parameter K = 3)(
+module counter#(parameter K = 4)(
 
     input clk,rst,en,
     output reg [K-1:0] cnt_out
