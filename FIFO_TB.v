@@ -52,32 +52,40 @@ module FIFO_TB;
     #5
     rst = 1;
     we = 0;
-    re = 0;
+    re = 1;
     #5;
     rst = 0;
+    data_in = 16'd1;#20
+    data_in = 16'd2;#20
+    data_in = 16'd3;#20
+    data_in = 16'd4;#20
+    data_in = 16'd5;#20
+    data_in = 16'd6;#20
+    data_in = 16'd7;#20
+    data_in = 16'd8;#20
+    we=1;
+    re=0;
+    data_in = 16'd1;#20
+    data_in = 16'd2;#20
+    data_in = 16'd3;#20
+    data_in = 16'd4;#20
+    data_in = 16'd5;#20
+    data_in = 16'd6;#20
+    data_in = 16'd7;#20
+    data_in = 16'd8;#20
+    we=0;
+    re=1;#180
     we = 1;
-    data_in = 16'd1;
-    #20
-    data_in = 16'd2;
-    #20
-    data_in = 16'd3;
-    re = 0;
-    #20
-    data_in = 16'd4;
-    #20
     re = 1;
-    data_in = 16'd5;
-    #20
-    data_in = 16'd6;
-    re = 0;
-    #20
-    data_in = 16'd7;
-    #30
-    data_in = 16'd8;
-    #20
-    re = 1;
-    #160
-    we = 0;
+    data_in = 16'd1;#20
+    data_in = 16'd2;#20
+    data_in = 16'd3;#20
+    data_in = 16'd4;#20
+    data_in = 16'd5;#20
+    data_in = 16'd6;#20
+    data_in = 16'd7;#20
+    data_in = 16'd8;#60
+    re = 0;#180;
     $finish;
     end
     
