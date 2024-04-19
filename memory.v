@@ -35,13 +35,13 @@ module memory#(parameter width = 16, parameter depth = 8,parameter adr_width = $
     
     reg [width-1:0] mem [depth-1:0];
     
-    always @(posedge clk,posedge load) begin
+    always @(posedge clk) begin
         if(load)
             mem[w_adr] <= data_in;
         else
             mem[w_adr] <= mem[w_adr];
     end
-     always @(posedge clk,posedge read) begin
+     always @(posedge clk) begin
         if(read)
             data_out <= mem[r_adr];
         else
