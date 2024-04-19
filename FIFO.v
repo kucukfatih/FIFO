@@ -55,17 +55,8 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
     .r_adr(r_adr_w[2:0]),
     .load(control_signals_w[4]),
     .read(control_signals_w[3]),
+    .clk(clk),
     .data_out(data_out));
-    
-//    comp w_comp (.A(depth-1),
-//    .B(w_adr_w),
-//    .equal_flag(status_signals_w[0]),
-//    .zero_flag(status_signals_w[2]));
-    
-//    comp r_comp (.A(depth-1),
-//    .B(r_adr_w),
-//    .equal_flag(status_signals_w[1]),
-//    .zero_flag(status_signals_w[3]));
     
     comp adr_comp (.A(w_adr_w),
     .B(r_adr_w),
