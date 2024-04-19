@@ -70,7 +70,7 @@ module controller(
     endcase 
     end
     
-    always @(state,we,re,status_signals) begin                  // status_signals = {not_equal_flag,equal_flag_full,equal_flag_empty}
+    always @(state,we,re,status_signals,fifo_full,fifo_empty) begin                  // status_signals = {not_equal_flag,equal_flag_full,equal_flag_empty}
                                                                 // control_signals = {load_data,read_data,rst,r_adr_trigger,w_adr_trigger}
     case(state)
         state_0: control_signals <= 5'b00100;
@@ -98,13 +98,13 @@ module controller(
     case(state)
         state_0: begin
     
-            fifo_full <= 0;
-            fifo_empty <= 1;
+            fifo_full = 0;
+            fifo_empty = 1;
         end
         
         default: begin
-            fifo_full <= (status_signals[2] && status_signals[1]);
-            fifo_empty <= status_signals[0] ;
+            fifo_full = (status_signals[2] && status_signals[1]);
+            fifo_empty = status_signals[0] ;
         end
         
     endcase
