@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module memory#(parameter width = 16, parameter depth = 8,parameter adr_width = $clog2(depth))(
+module memory#(parameter fwft_enable = 1,parameter width = 16, parameter depth = 8,parameter adr_width = $clog2(depth))(
 
     
     input wire [width-1:0] data_in,
@@ -42,10 +42,18 @@ module memory#(parameter width = 16, parameter depth = 8,parameter adr_width = $
             mem[w_adr] <= mem[w_adr];
     end
      always @(posedge clk) begin
-        if(read)
-            data_out <= mem[r_adr];
-        else
-            data_out <= data_out;
+        if(fwft_enable) begin
+            if(read) 
+                data_out <= mem[r_adr];
+            else
+                data_out <= mem[0]; // first word fall through
+        end
+        else begin
+            if(read)
+                data_out <= mem[r_adr];
+            else
+                data_out <= data_out;
+         end
 
     end
     

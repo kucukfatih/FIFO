@@ -20,24 +20,24 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module controller(
+module controller#(parameter fwft_enable = 1)(
 
     input wire clk,
     input wire rst,
     input wire we,
     input wire re,
-    input wire [2:0] status_signals,
+    input wire [3:0] status_signals,
     output reg [4:0] control_signals,
     output reg fifo_full,
     output reg fifo_empty
     
     );
     
-    reg [1:0] state,next_state;
+    reg  state,next_state;
     
-    parameter state_0 = 2'b00;
-    parameter state_1 = 2'b01;
-    parameter state_2 = 2'b10;
+    localparam state_0 = 1'b0;
+    localparam state_1 = 1'b1;
+   
     
    
     (*dont_touch = "true" *)
@@ -55,14 +55,14 @@ module controller(
     
     case(state)
         
-        state_0: next_state <= state_1;
-        state_1: begin
+
+        state_0: begin
             if(we==0 && re==0)
-                next_state <= state_1;
+                next_state <= state_0;
             else 
-                next_state <= state_2;
+                next_state <= state_1;
         end
-        state_2:begin
+        state_1:begin
                 next_state <= state_1;
         end
 
@@ -70,10 +70,10 @@ module controller(
     endcase 
     end
     
-    always @(state,we,re,status_signals,fifo_full,fifo_empty) begin                  // status_signals = {not_equal_flag,equal_flag_full,equal_flag_empty}
+    always @(state,we,re,status_signals,fifo_full,fifo_empty) begin  // status_signals = {not_equal_flag,equal_flag_full,equal_flag_empty_fwft,equal_flag_empty}
                                                                 // control_signals = {load_data,read_data,rst,r_adr_trigger,w_adr_trigger}
     case(state)
-        state_0: control_signals <= 5'b00100;
+        state_0:control_signals <= 5'b00100;
         state_1: begin
             if((we==1&&re==1)&&(!fifo_full && !fifo_empty))     // load and read data (if fifo not full and not empty)
                 control_signals <= 5'b11011;
@@ -103,8 +103,13 @@ module controller(
         end
         
         default: begin
-            fifo_full = (status_signals[2] && status_signals[1]);
-            fifo_empty = status_signals[0] ;
+            fifo_full = (status_signals[3] && status_signals[2]);
+            
+            if(fwft_enable)
+                fifo_empty = status_signals[1] ; // if fwft enable compare (read_adr - 1) and write_adr 
+            else
+                fifo_empty = status_signals[0] ; // if fwft disabled compare read_adr and write_adr
+    
         end
         
     endcase

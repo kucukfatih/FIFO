@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $clog2(depth))(
+module FIFO#(parameter fwft_enable = 1,parameter width = 16, parameter depth = 8,parameter adr_width = $clog2(depth))(
 
     input wire clk,
     input wire rst,
@@ -33,7 +33,7 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
 
     );
     
-    wire [2:0] status_signals_w;
+    wire [3:0] status_signals_w;
     wire [4:0] control_signals_w;
     
     wire [adr_width:0] w_adr_w;
@@ -41,7 +41,7 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
     
     (*dont_touch = "true" *)
      
-    controller con1(.clk(clk),
+    controller #(fwft_enable) con1(.clk(clk),
     .rst(rst),
     .we(we),
     .re(re),
@@ -50,7 +50,7 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
     .fifo_full(fifo_full),
     .fifo_empty(fifo_empty));
     
-    memory mem1(.data_in(data_in),
+    memory #(fwft_enable,width,depth,adr_width) mem1(.data_in(data_in),
     .w_adr(w_adr_w[2:0]),
     .r_adr(r_adr_w[2:0]),
     .load(control_signals_w[4]),
@@ -58,17 +58,20 @@ module FIFO#(parameter width = 16, parameter depth = 8,parameter adr_width = $cl
     .clk(clk),
     .data_out(data_out));
     
-    comp adr_comp (.A(w_adr_w),
+    comp #(adr_width + 1) adr_comp (.A(w_adr_w),
     .B(r_adr_w),
     .equal_flag_empty(status_signals_w[0]),
-    .equal_flag_full(status_signals_w[1]),
-    .not_equal_flag(status_signals_w[2]));
+    .equal_flag_empty_fwft(status_signals_w[1]),
+    .equal_flag_full(status_signals_w[2]),
+    .not_equal_flag(status_signals_w[3]));
     
-    counter w_cnt (.clk(clk),.en(control_signals_w[0]),
+    counter #(adr_width + 1) w_cnt (.clk(clk),
+    .en(control_signals_w[0]),
     .rst(control_signals_w[2]),
     .cnt_out(w_adr_w));
     
-    counter r_cnt (.clk(clk),.en(control_signals_w[1]),
+    read_counter #(fwft_enable,adr_width + 1) r_cnt (.clk(clk),
+    .en(control_signals_w[1]),
     .rst(control_signals_w[2]),
     .cnt_out(r_adr_w));
     
