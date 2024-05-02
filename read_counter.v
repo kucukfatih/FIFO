@@ -28,16 +28,7 @@ module read_counter#(parameter fwft = 1,parameter K = 4)(
     );
     
     always @(posedge clk,posedge rst) begin 
-    if(fwft) begin
-        if (rst) 
-            cnt_out <= 1; // if fwft enable start read from second address 
-        else if(en) 
-            cnt_out <= cnt_out + 1;
-        else
-            cnt_out <= cnt_out;
-        
-        end
-    else begin
+
         if (rst) 
             cnt_out <= 0;
         else if(en) 
@@ -46,5 +37,5 @@ module read_counter#(parameter fwft = 1,parameter K = 4)(
             cnt_out <= cnt_out;
         
         end
-    end
+
 endmodule

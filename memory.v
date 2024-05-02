@@ -33,7 +33,7 @@ module memory#(parameter fwft_enable = 1,parameter width = 16, parameter depth =
 
     );
     
-    reg [width-1:0] mem [depth-1:0];
+    (* ram_style = "block" *)  reg [width-1:0] mem [depth-1:0];
     
     always @(posedge clk) begin
         if(load)
@@ -43,10 +43,9 @@ module memory#(parameter fwft_enable = 1,parameter width = 16, parameter depth =
     end
      always @(posedge clk) begin
         if(fwft_enable) begin
-            if(read) 
-                data_out <= mem[r_adr];
-            else
-                data_out <= mem[0]; // first word fall through
+        
+            data_out <= mem[r_adr];
+        
         end
         else begin
             if(read)

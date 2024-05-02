@@ -104,11 +104,8 @@ module controller#(parameter fwft_enable = 1)(
         
         default: begin
             fifo_full = (status_signals[3] && status_signals[2]);
-            
-            if(fwft_enable)
-                fifo_empty = status_signals[1] ; // if fwft enable compare (read_adr - 1) and write_adr 
-            else
-                fifo_empty = status_signals[0] ; // if fwft disabled compare read_adr and write_adr
+
+            fifo_empty = status_signals[0] ; 
     
         end
         
